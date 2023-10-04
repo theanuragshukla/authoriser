@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1695701250739,
+      "tag": "0000_panoramic_kylun",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1695713592749,
+      "tag": "0001_complex_catseye",
+      "breakpoints": true
+    }
+  ]
+}
