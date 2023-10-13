@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "f5d79aab-707b-4c53-80f3-d420127b668d",
+  "id": "d6321e65-fd77-42d0-9907-ec1c294e3a23",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "authseed": {
@@ -14,17 +14,12 @@
           "primaryKey": true,
           "notNull": true
         },
-        "access": {
-          "name": "access",
-          "type": "varchar(16)[]",
+        "sessions": {
+          "name": "sessions",
+          "type": "json",
           "primaryKey": false,
-          "notNull": false
-        },
-        "refresh": {
-          "name": "refresh",
-          "type": "varchar(16)[]",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "'{}'::json"
         }
       },
       "indexes": {},

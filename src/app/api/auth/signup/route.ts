@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { signupSchema } from '@/utils/zodSchemas';
 import { checkDupUser, generateTokens, generateUid, hashFunc, saveUser } from '@/utils/helpers';
-import { DbUser } from '@/utils/interfaces/auth';
+import { DbUser, SignupReq } from '@/utils/interfaces/auth';
+
+interface Response{
+    status:Boolean,
+    errors?: SignupReq,
+    msg:String,
+    data?:{
+        accessToken:String,
+        refreshToken:String,
+        userId:String
+    }
+}
 
 export async function POST(req: NextRequest) {
     try {
@@ -18,7 +29,7 @@ export async function POST(req: NextRequest) {
             const { status, user } = await saveUser(body)
             if (status && !!user) {
                 const tokens = await generateTokens(user as DbUser)
-                return NextResponse.json({ status: true, accessToken: tokens.access_token, refreshToken: tokens.refresh_token, userId: user.uid })
+                return NextResponse.json({ status: true, msg: "signup success", data: { accessToken: tokens.access_token, refreshToken: tokens.refresh_token, userId: user.uid } })
             }
         } else {
             const errors = validation.error.formErrors.fieldErrors
@@ -26,7 +37,7 @@ export async function POST(req: NextRequest) {
         }
 
     } catch (error: any) {
-        return NextResponse.json({ status: false, data: error.message || "Unexpected server error" })
+        return NextResponse.json({ status: false, msg: error.message || "Unexpected server error" })
     }
 }
 

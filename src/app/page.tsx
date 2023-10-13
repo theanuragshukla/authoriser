@@ -1,8 +1,8 @@
 import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { ArrowRight } from "iconsax-react";
 import HomeLayout from "./layouts/HomeLayout";
-import { ArrowRight, Login } from "iconsax-react";
-import Router from "./common/Router";
 import AnimateIt from "./common/AnimateIt";
+import Router from "./common/Router";
 
 export default function Home() {
     return (
