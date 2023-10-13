@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS "authseed" (
 	"uid" varchar(32) PRIMARY KEY NOT NULL,
-	"access" varchar(16)[],
-	"refresh" varchar(16)[],
+	"sessions" json DEFAULT '{}'::json,
 	CONSTRAINT "authseed_uid_unique" UNIQUE("uid")
 );
 --> statement-breakpoint

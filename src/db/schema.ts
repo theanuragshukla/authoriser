@@ -1,4 +1,12 @@
-import { boolean, json, pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+    boolean,
+    json,
+    pgTable,
+    serial,
+    text,
+    timestamp,
+    varchar,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
     id: serial("id"),
@@ -9,10 +17,14 @@ export const users = pgTable("users", {
     password: text("password").notNull(),
     isVerified: boolean("is_verified").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().notNull()
-})
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 export const authseed = pgTable("authseed", {
-    uid: varchar("uid", { length: 32 }).primaryKey().notNull().unique().references(() => users.uid),
-        sessions:json("sessions", {})
-})
+    uid: varchar("uid", { length: 32 })
+        .primaryKey()
+        .notNull()
+        .unique()
+        .references(() => users.uid),
+    sessions: json("sessions").default({}),
+});
