@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
-import { DbUser, User } from "./interfaces/auth";
+import { DbUser, Session, User } from "./interfaces/auth";
 import { authseed, users } from "@/db/schema";
 import bcrypt from "bcryptjs";
 import db from "@/db/connection";
@@ -36,8 +36,9 @@ export const isAuthenticated = async (
                 .from(authseed)
                 .where(eq(authseed.uid, data));
             if (row.length === 0) return { status: false, msg: "unauthorised" };
-            const session = row[0].sessions[seed];
-            if (!session?.valid) return { status: false, msg: "unauthorised" };
+            const session = row[0].sessions as Session;
+            if (!session[seed]?.valid)
+                return { status: false, msg: "unauthorised" };
             return { status: true, msg: "authorised" };
         } else {
             return { status: false, msg: "unauthorised" };
@@ -63,8 +64,8 @@ export const refreshTokens = async (req: NextRequest) => {
             .from(authseed)
             .where(eq(authseed.uid, data));
         if (row.length === 0) return { status: false, msg: "unauthorised" };
-        const session = row[0].sessions[seed];
-        if (!session.valid) return { status: false, msg: "unauthorised" };
+        const session = row[0].sessions as Session;
+        if (!session[seed].valid) return { status: false, msg: "unauthorised" };
         const tokens = await generateTokens(userid);
         return { status: true, msg: "authorised", tokens, refreshed: true };
     } else {
@@ -94,7 +95,7 @@ export const verifyHash = async (clearText: string, hash: string) => {
     return await bcrypt.compare(clearText, hash);
 };
 
-export const updateTokens = async (uid: String, seed: string) => {
+export const updateTokens = async (uid: string, seed: string) => {
     const res = await db
         .insert(authseed)
         .values({
@@ -110,7 +111,7 @@ export const updateTokens = async (uid: String, seed: string) => {
     return { status: false };
 };
 
-export const generateTokens = async (uid: String) => {
+export const generateTokens = async (uid: string) => {
     const seed = generateUid(16);
     const payload = (usage: string) => ({
         data: uid,

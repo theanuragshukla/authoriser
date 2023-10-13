@@ -14,29 +14,28 @@ export async function AuthProvider({
     exception?: {
         [key: string]: Boolean | null;
     };
-}) {
+}): Promise<JSX.Element> {
     const header = headers();
     const pathname = header.get("x-pathname") || null;
     if (!!pathname && exception[pathname] === null) {
-        return children;
+        return <>{children}</>;
     }
 
     const reqCookies = cookies();
     const { status: isLoggedIn } = await isAuthenticated(reqCookies);
     if (requireLogin) {
-        if (isLoggedIn) return children;
+        if (isLoggedIn) return <>{children}</>;
         else if (reqCookies.has(REFRESH_TOKEN) && reqCookies.has(UID)) {
             redirect("/token", RedirectType.push);
-        }else{
-
+        } else {
         }
-    }else{
+    } else {
         if (isLoggedIn) redirect("/dashboard");
         else if (reqCookies.has(REFRESH_TOKEN) && reqCookies.has(UID)) {
             redirect(`/token`);
         } else {
-            return children;
+            return <>{children}</>;
         }
     }
-    return "gaehrguioae;rg";
+    return <>This shouldn&apos;t happen</>;
 }

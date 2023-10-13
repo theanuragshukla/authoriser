@@ -15,10 +15,10 @@ import { useState } from "react";
 interface Props {
     name: string;
     formik: any;
-    label: string;
-    placeHolder: string;
-    type: string;
-    required: boolean;
+    label?: string;
+    placeHolder?: string;
+    type?: string;
+    required?: boolean;
 }
 
 export default function CustomTextField({

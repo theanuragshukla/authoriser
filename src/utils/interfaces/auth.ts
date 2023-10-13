@@ -21,3 +21,8 @@ export interface DbUser extends User {
     updatedAt: Date;
 }
 
+export interface Session {
+    [seed: string]: {
+        [key: string]: string;
+    };
+}

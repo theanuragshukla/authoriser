@@ -2,11 +2,10 @@
 
 import Link from "next/link"
 import { ReactNode } from "react"
-import {  Url } from "url"
 
 
 interface Props {
-    to: Url,
+    to: string,
     children: ReactNode
 }
 

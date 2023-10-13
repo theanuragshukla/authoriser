@@ -12,7 +12,7 @@ import {
 import { Link } from "@chakra-ui/next-js";
 import { useFormik } from "formik";
 import { LoginModal } from "@/utils/interfaces/auth";
-import {  useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { InfoCircle } from "iconsax-react";
 import { login } from "@/app/data/managers/auth";
@@ -84,6 +84,9 @@ export default function Login() {
                         <Text fontSize="lg">
                             to enjoy all of our cool features
                         </Text>
+                        const navigate = useNavigate(); const toast =
+                        useToast(); const [loading, setLoading] =
+                        useState(false);
                     </Stack>
                     <Box
                         rounded="lg"
@@ -95,8 +98,8 @@ export default function Login() {
                         <Stack spacing={8}>
                             <Box
                                 display={
-                                    Object.keys(loginErr.errors).length === 0 &&
-                                    loginErr.msg?.length === 0
+                                    Object.keys(loginErr.errors!).length ===
+                                        0 && loginErr.msg?.length === 0
                                         ? "none"
                                         : "block"
                                 }
@@ -108,7 +111,7 @@ export default function Login() {
                                             {!!loginErr.msg
                                                 ? loginErr.msg
                                                 : Object.values(
-                                                      loginErr.errors
+                                                      loginErr.errors!
                                                   )?.[0]?.[0]}
                                         </Text>
                                     </Flex>
