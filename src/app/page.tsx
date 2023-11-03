@@ -25,7 +25,7 @@ export default function Home() {
                 </AnimateIt>
                 <AnimateIt>
                     <Flex mt={4}>
-                        <Router to="/signup">
+                        <Router to="/login">
                             <Button colorScheme="purple" rightIcon={<ArrowRight />}> Get Started </Button>
                         </Router>
                     </Flex>

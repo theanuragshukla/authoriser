@@ -8,6 +8,20 @@
       "when": 1696431676488,
       "tag": "0000_reflective_dazzler",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1699002436962,
+      "tag": "0001_condemned_oracle",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1699012451244,
+      "tag": "0002_jazzy_big_bertha",
+      "breakpoints": true
     }
   ]
 }

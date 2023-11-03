@@ -84,9 +84,6 @@ export default function Login() {
                         <Text fontSize="lg">
                             to enjoy all of our cool features
                         </Text>
-                        const navigate = useNavigate(); const toast =
-                        useToast(); const [loading, setLoading] =
-                        useState(false);
                     </Stack>
                     <Box
                         rounded="lg"

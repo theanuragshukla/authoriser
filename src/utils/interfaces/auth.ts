@@ -12,6 +12,7 @@ export interface SignupReq {
 
 export interface User extends SignupReq {
     uid: string;
+    isDeveloper:boolean
 }
 
 export interface DbUser extends User {
@@ -25,4 +26,13 @@ export interface Session {
     [seed: string]: {
         [key: string]: string;
     };
+}
+
+export interface Profile {
+    uid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    isVerified: boolean;
+    isDeveloper:boolean
 }

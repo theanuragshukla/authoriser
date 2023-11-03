@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
             if (exists) {
                 const isMatch = await verifyHash(password, user.password);
                 if (isMatch) {
-                    const tokens = await generateTokens(user.uid);
+                    const tokens = await generateTokens(user);
                     const response = NextResponse.json({
                         status: true,
                         msg: "Login Success",

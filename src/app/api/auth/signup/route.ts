@@ -8,6 +8,7 @@ import {
     saveUser,
 } from "@/utils/helpers";
 import { SignupReq } from "@/utils/interfaces/auth";
+import { ACCESS_TOKEN, REFRESH_TOKEN, UID } from "@/app/data/constants";
 
 interface Response {
     status: Boolean;
@@ -37,16 +38,31 @@ export async function POST(req: NextRequest) {
             body.password = await hashFunc(password);
             const { status, user } = await saveUser(body);
             if (status && !!user) {
-                const tokens = await generateTokens(body.uid);
-                return NextResponse.json({
+                const tokens = await generateTokens(user);
+                const response = NextResponse.json({
                     status: true,
-                    msg: "signup success",
-                    data: {
-                        accessToken: tokens.access_token,
-                        refreshToken: tokens.refresh_token,
-                        userId: user.uid,
-                    },
+                    msg: "Signup Success",
                 });
+                response.cookies.set(ACCESS_TOKEN, tokens.access_token, {
+                    secure: true,
+                    sameSite: true,
+                    maxAge: 3600,
+                    httpOnly: true,
+                });
+                response.cookies.set(REFRESH_TOKEN, tokens.refresh_token, {
+                    secure: true,
+                    sameSite: true,
+                    maxAge: 3600 * 24 * 30,
+                    httpOnly: true,
+                });
+                response.cookies.set(UID, user.uid, {
+                    secure: true,
+                    sameSite: true,
+                    maxAge: 3600 * 24 * 30,
+                    httpOnly: true,
+                });
+
+                return response;
             } else
                 return NextResponse.json({
                     status: false,

@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import { Providers } from "./providers/chakraProvider"
+import { AuthProvider } from "./providers/AuthProvider"
 
 export const metadata: Metadata = {
     title: 'Authoriser',
@@ -15,7 +16,9 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <Providers>
+                <AuthProvider requireLogin={true} exception={{"/":null, "/token":null}}>
                     {children}
+                    </AuthProvider>
                 </Providers>
             </body>
         </html>

@@ -8,38 +8,73 @@ import {
     Heading,
     Stack,
     Text,
+    useToast,
 } from "@chakra-ui/react";
 import { Link } from "@chakra-ui/next-js";
-import {  useFormik } from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import { InfoCircle } from "iconsax-react";
 import { SignupReq } from "@/utils/interfaces/auth";
 import HomeLayout from "@/app/layouts/HomeLayout";
 import CustomTextField from "@/app/common/CustomTextField";
 import { signup } from "@/app/data/managers/auth";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const signupSchema = Yup.object({
-    firstName: Yup.string()
-        .required("First name is required")
-        .max(50, "First name should be less than 50 chars"),
-    lastName: Yup.string().max(50, "Last name should be less than 50 chars"),
-    email: Yup.string()
-        .required("Email is required")
-        .email("Enter a valid email Address"),
-    password: Yup.string()
-        .required("Password is required")
-        .max(128, "Password can contain maximum 128 characters")
-        .min(8, "Password should contain atleast 8 characters"),
-});
-
-const handleSubmit = async (values: SignupReq) => {
-    const { status, msg } = await signup(values);
-    if (status) {
-    } else {
-        alert(msg);
-    }
-};
 export default function Signup() {
+    interface SignupErr {
+        msg: String;
+        errors?: {
+            firstName?: [String];
+            lastName?: [String];
+            email?: [String];
+            password?: [String];
+        };
+    }
+    const [loading, setLoading] = useState(false);
+    const [signupErr, setSignupErr] = useState<SignupErr>({
+        msg: "",
+        errors: {},
+    });
+    const router = useRouter();
+    const toast = useToast();
+
+    const signupSchema = Yup.object({
+        firstName: Yup.string()
+            .required("First name is required")
+            .max(50, "First name should be less than 50 chars"),
+        lastName: Yup.string().max(
+            50,
+            "Last name should be less than 50 chars"
+        ),
+        email: Yup.string()
+            .required("Email is required")
+            .email("Enter a valid email Address"),
+        password: Yup.string()
+            .required("Password is required")
+            .max(128, "Password can contain maximum 128 characters")
+            .min(8, "Password should contain atleast 8 characters"),
+    });
+
+    const handleSubmit = async (values: SignupReq) => {
+        setLoading(true);
+        setSignupErr(() => ({ msg: "", errors: {} }));
+        const { status, msg, errors = {} } = await signup(values);
+        if (status) {
+            toast({
+                status: "success",
+                title: "Login successful",
+            });
+            router.push("/dashboard");
+        } else {
+            toast({
+                status: "error",
+                title: msg || "Enter a valid value",
+            });
+            setSignupErr(() => ({ msg, errors }));
+        }
+        setLoading(false);
+    };
     const formik = useFormik({
         initialValues: {
             firstName: "",
@@ -94,6 +129,28 @@ export default function Signup() {
                                     )}
                                 </Text>
                             </Box>
+
+                            <Box
+                                display={
+                                    Object.keys(signupErr.errors!).length ===
+                                        0 && signupErr.msg?.length === 0
+                                        ? "none"
+                                        : "block"
+                                }
+                            >
+                                <Text color="orange">
+                                    <Flex gap={1}>
+                                        <InfoCircle />
+                                        <Text>
+                                            {!!signupErr.msg
+                                                ? signupErr.msg
+                                                : Object.values(
+                                                      signupErr.errors!
+                                                  )?.[0]?.[0]}
+                                        </Text>
+                                    </Flex>
+                                </Text>
+                            </Box>
                             <HStack>
                                 <CustomTextField
                                     formik={formik}
@@ -123,9 +180,10 @@ export default function Signup() {
                             </Checkbox>
                             <Stack spacing={10} pt={2}>
                                 <Button
-                                    loadingText="Submitting"
                                     onClick={() => formik.handleSubmit()}
                                     size="lg"
+                                    isLoading={loading}
+                                    loadingText="Submitting"
                                     bg={"blue.500"}
                                     color={"white"}
                                     _hover={{
