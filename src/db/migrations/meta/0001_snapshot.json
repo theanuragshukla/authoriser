@@ -1,9 +1,241 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "d4778490-5982-4686-af2d-7878ec577eb3",
-  "prevId": "d6321e65-fd77-42d0-9907-ec1c294e3a23",
+  "id": "b13facfa-197a-4683-95e1-3c3c07ae36d6",
+  "prevId": "cfede6a0-152c-4539-8fe2-e6b687236367",
   "tables": {
+    "app_creds": {
+      "name": "app_creds",
+      "schema": "",
+      "columns": {
+        "appId": {
+          "name": "appId",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client_secret": {
+          "name": "client_secret",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "app_creds_appId_apps_appId_fk": {
+          "name": "app_creds_appId_apps_appId_fk",
+          "tableFrom": "app_creds",
+          "tableTo": "apps",
+          "columnsFrom": [
+            "appId"
+          ],
+          "columnsTo": [
+            "appId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "app_creds_appId_unique": {
+          "name": "app_creds_appId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "appId"
+          ]
+        }
+      }
+    },
+    "app_details": {
+      "name": "app_details",
+      "schema": "",
+      "columns": {
+        "appId": {
+          "name": "appId",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "redirect_uri": {
+          "name": "redirect_uri",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "homepage": {
+          "name": "homepage",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "support_email": {
+          "name": "support_email",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "app_details_appId_apps_appId_fk": {
+          "name": "app_details_appId_apps_appId_fk",
+          "tableFrom": "app_details",
+          "tableTo": "apps",
+          "columnsFrom": [
+            "appId"
+          ],
+          "columnsTo": [
+            "appId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "app_details_appId_unique": {
+          "name": "app_details_appId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "appId"
+          ]
+        }
+      }
+    },
+    "app_info": {
+      "name": "app_info",
+      "schema": "",
+      "columns": {
+        "appId": {
+          "name": "appId",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "app_name": {
+          "name": "app_name",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_desc": {
+          "name": "app_desc",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "app_logo": {
+          "name": "app_logo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "app_policy": {
+          "name": "app_policy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "app_tos": {
+          "name": "app_tos",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "app_info_appId_apps_appId_fk": {
+          "name": "app_info_appId_apps_appId_fk",
+          "tableFrom": "app_info",
+          "tableTo": "apps",
+          "columnsFrom": [
+            "appId"
+          ],
+          "columnsTo": [
+            "appId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "app_info_appId_unique": {
+          "name": "app_info_appId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "appId"
+          ]
+        }
+      }
+    },
+    "apps": {
+      "name": "apps",
+      "schema": "",
+      "columns": {
+        "appId": {
+          "name": "appId",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "uid": {
+          "name": "uid",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "apps_uid_users_uid_fk": {
+          "name": "apps_uid_users_uid_fk",
+          "tableFrom": "apps",
+          "tableTo": "users",
+          "columnsFrom": [
+            "uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "apps_appId_unique": {
+          "name": "apps_appId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "appId"
+          ]
+        }
+      }
+    },
     "authseed": {
       "name": "authseed",
       "schema": "",
@@ -48,6 +280,84 @@
           ]
         }
       }
+    },
+    "client_access_seeds": {
+      "name": "client_access_seeds",
+      "schema": "",
+      "columns": {
+        "uid": {
+          "name": "uid",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "appId": {
+          "name": "appId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seeds": {
+          "name": "seeds",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'::json"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "client_access_seeds_uid_users_uid_fk": {
+          "name": "client_access_seeds_uid_users_uid_fk",
+          "tableFrom": "client_access_seeds",
+          "tableTo": "users",
+          "columnsFrom": [
+            "uid"
+          ],
+          "columnsTo": [
+            "uid"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "client_access_seeds_appId_apps_appId_fk": {
+          "name": "client_access_seeds_appId_apps_appId_fk",
+          "tableFrom": "client_access_seeds",
+          "tableTo": "apps",
+          "columnsFrom": [
+            "appId"
+          ],
+          "columnsTo": [
+            "appId"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "client_access_seeds_uid_appId": {
+          "name": "client_access_seeds_uid_appId",
+          "columns": [
+            "uid",
+            "appId"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     },
     "users": {
       "name": "users",

@@ -1,7 +1,7 @@
 import { LoginModal, SignupReq } from "@/utils/interfaces/auth";
 import getClient from "../client";
 
-const reqModal = async (func: Function) => {
+export const reqModal = async (func: Function) => {
     try {
         const { status, data } = await func();
         if (status === 200) {

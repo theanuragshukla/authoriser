@@ -155,7 +155,7 @@ export default function Login() {
                             <Stack pt={6}>
                                 <Text align="center">
                                     Don&apos;t have an account?
-                                    <Link href="/signup" color="yellow.100">
+                                    <Link href="/signup" color="yellow.100" replace>
                                         Signup
                                     </Link>
                                 </Text>

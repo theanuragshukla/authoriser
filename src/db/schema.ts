@@ -1,7 +1,10 @@
 import {
+    PgTableExtraConfig,
+    PrimaryKey,
     boolean,
     json,
     pgTable,
+    primaryKey,
     serial,
     text,
     timestamp,
@@ -37,11 +40,10 @@ export const apps = pgTable("apps", {
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     uid: varchar("uid", { length: 32 })
         .notNull()
-        .unique()
         .references(() => users.uid),
 });
 
-export const appInfo = pgTable("appInfo", {
+export const appInfo = pgTable("app_info", {
     appId: varchar("appId", { length: 64 })
         .primaryKey()
         .notNull()
@@ -74,3 +76,21 @@ export const appDetails = pgTable("app_details", {
     homepage: varchar("homepage", { length: 200 }),
     supportEmail: varchar("support_email", { length: 100 }),
 });
+
+export const clientSeeds = pgTable(
+    "client_access_seeds",
+    {
+        uid: varchar("uid", { length: 32 })
+            .notNull()
+            .references(() => users.uid),
+        appId: varchar("appId", { length: 64 })
+            .notNull()
+            .references(() => apps.appId),
+        seeds: json("seeds").default({}),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        pk: primaryKey(table.uid, table.appId),
+    })
+);

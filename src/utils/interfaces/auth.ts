@@ -1,6 +1,18 @@
+import { Session } from "inspector";
+
 export interface LoginModal {
     email: string;
     password: string;
+}
+export interface AddAppModal {
+    name: string;
+    description: string;
+    logo: string;
+    tosUrl: string;
+    privacyPolicyUrl: string;
+    supportEmail: string;
+    redirectUri: string;
+    homepage: string;
 }
 
 export interface SignupReq {
@@ -12,7 +24,7 @@ export interface SignupReq {
 
 export interface User extends SignupReq {
     uid: string;
-    isDeveloper:boolean
+    isDeveloper: boolean;
 }
 
 export interface DbUser extends User {
@@ -28,11 +40,18 @@ export interface Session {
     };
 }
 
+export interface Seeds extends Session {}
+
 export interface Profile {
     uid: string;
     firstName: string;
     lastName: string;
     email: string;
     isVerified: boolean;
-    isDeveloper:boolean
+    isDeveloper: boolean;
+}
+
+export interface GlobalLogin {
+    status: boolean;
+    profile: Profile | null;
 }

@@ -1,26 +1,33 @@
-import { Metadata } from "next"
-import { Providers } from "./providers/chakraProvider"
-import { AuthProvider } from "./providers/AuthProvider"
+import { Metadata } from "next";
+import { Providers } from "./providers/chakraProvider";
+import { AuthProvider } from "./providers/AuthProvider";
+import ProfileProvider from "./providers/ProfileProvider";
+
 
 export const metadata: Metadata = {
-    title: 'Authoriser',
-    description: 'Next Level OAuth Solution',
-}
+  title: "Authoriser",
+  description: "Next Level OAuth Solution",
+};
 
 export default function RootLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode;
 }) {
-    return (
-        <html lang="en">
-            <body>
-                <Providers>
-                <AuthProvider requireLogin={true} exception={{"/":null, "/token":null}}>
-                    {children}
-                    </AuthProvider>
-                </Providers>
-            </body>
-        </html>
-    )
+  return (
+    <html lang="en">
+      <body>
+        <Providers>
+          <ProfileProvider>
+            <AuthProvider
+              requireLogin={true}
+              exception={{ "/": null, "/token": null }}
+            >
+              {children}
+            </AuthProvider>
+          </ProfileProvider>
+        </Providers>
+      </body>
+    </html>
+  );
 }

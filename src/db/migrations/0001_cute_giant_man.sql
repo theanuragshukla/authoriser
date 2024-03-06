@@ -1,0 +1,1 @@
+ALTER TABLE "client_access_seeds" ADD CONSTRAINT "client_access_seeds_uid_appId" PRIMARY KEY("uid","appId");

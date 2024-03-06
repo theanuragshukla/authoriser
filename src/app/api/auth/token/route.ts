@@ -4,7 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
     try {
-        const { status, tokens = null } = await refreshTokens(req);
+        const refresh = req.cookies.get(REFRESH_TOKEN)?.value;
+        const userid = req.cookies.get(UID)?.value;
+        const { status, tokens = null } = await refreshTokens(refresh, userid);
         if (status && !!tokens) {
             const response = NextResponse.json({
                 status: true,
@@ -42,7 +44,7 @@ export async function GET(req: NextRequest) {
     } catch (error: any) {
         const response = NextResponse.json({
             status: false,
-            msg: error.message ||  "tokens cannot be refreshed",
+            msg: error.message || "tokens cannot be refreshed",
         });
         response.cookies.delete(ACCESS_TOKEN);
         response.cookies.delete(REFRESH_TOKEN);

@@ -1,7 +1,7 @@
-import crypto from "crypto";
-import { eq } from "drizzle-orm";
-import { DbUser, Profile, Session, User } from "./interfaces/auth";
-import { authseed, users } from "@/db/schema";
+import crypto, { createHash, secureHeapUsed } from "crypto";
+import { and, eq } from "drizzle-orm";
+import { DbUser, Profile, Seeds, Session, User } from "./interfaces/auth";
+import { authseed, clientSeeds, users } from "@/db/schema";
 import bcrypt from "bcryptjs";
 import db from "@/db/connection";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -9,9 +9,21 @@ import { ACCESS_TOKEN, REFRESH_TOKEN, UID } from "@/app/data/constants";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { RequestCookies } from "next/dist/compiled/@edge-runtime/cookies";
 import { NextRequest } from "next/server";
-
 const saltRounds = 10;
 const secret = process.env.JWT_SECRET || "nosecret";
+
+export const hashAuthRequest = (
+    clientId: String,
+    state: String,
+    secret: String
+) => {
+    const hash = createHash("sha256");
+    hash.update(`${clientId}${secret}`);
+    hash.update(`${state}${secret}`);
+    const digest = hash.digest("hex");
+    const nonce = digest.toString().substring(0, 32);
+    return nonce;
+};
 
 export const isAuthenticated = async (
     cookies: ReadonlyRequestCookies | RequestCookies,
@@ -25,7 +37,7 @@ export const isAuthenticated = async (
     try {
         const access = cookies.get(ACCESS_TOKEN)?.value;
         if (!!access) {
-            const { data, seed, usage } = jwt.verify(
+            const { data, seed, usage, uid } = jwt.verify(
                 access,
                 secret
             ) as JwtPayload;
@@ -41,13 +53,13 @@ export const isAuthenticated = async (
             //              .from(authseed)
             //            .where(eq(authseed.uid, data));
             //      if (row.length === 0) return { status: false, msg: "unauthorised" };
-            //          const session = row[0].sessions as Session;
-            //          if (!session[seed]?.valid)
+            //          const seeds = row[0].sessions as Session;
+            //          if (!seeds[seed]?.valid)
             //             return { status: false, msg: "unauthorised" };
             return {
                 status: true,
                 msg: "authorised",
-                ...(includeProfile ? { data } : {}),
+                ...(includeProfile ? { data: { ...data, uid } } : {}),
             };
         } else {
             return { status: false, msg: "unauthorised" };
@@ -101,10 +113,8 @@ export const upgradeAccount = async (uid: string) => {
     };
 };
 
-export const refreshTokens = async (req: NextRequest) => {
+export const refreshTokens = async (refresh?: string, userid?: string) => {
     const secret = process.env.JWT_SECRET || "";
-    const refresh = req.cookies.get(REFRESH_TOKEN)?.value;
-    const userid = req.cookies.get(UID)?.value;
     if (!!refresh && !!userid) {
         const { uid, seed, usage } = jwt.verify(refresh, secret) as JwtPayload;
         if (usage !== "refresh")
@@ -114,8 +124,8 @@ export const refreshTokens = async (req: NextRequest) => {
             .from(authseed)
             .where(eq(authseed.uid, uid));
         if (row.length === 0) return { status: false, msg: "unauthorised" };
-        const session = row[0].sessions as Session;
-        if (!session[seed].valid) return { status: false, msg: "unauthorised" };
+        const seeds = row[0].sessions as Session;
+        if (!seeds[seed].valid) return { status: false, msg: "unauthorised" };
         const res = await db.select().from(users).where(eq(users.uid, uid));
         if (res.length !== 0) {
             const tokens = await generateTokens(res[0] as DbUser);
@@ -127,8 +137,33 @@ export const refreshTokens = async (req: NextRequest) => {
     return { status: false, msg: "unauthorised" };
 };
 
+
+export const refreshClientTokens = async (refresh?: string, userid?: string, appId?: string) => {
+    const secret = process.env.JWT_SECRET || "";
+    if (!!refresh && !!userid && !!appId){
+        const { uid, seed, usage, client_id, appId } = jwt.verify(refresh, secret) as JwtPayload;
+        if (usage !== "refresh")
+            return { status: false, msg: "Invalid Refresh Token" };
+        const row = await db
+            .select()
+            .from(clientSeeds)
+            .where(and(eq(clientSeeds.uid, uid), eq(clientSeeds.appId, appId)));
+        if (row.length === 0) return { status: false, msg: "unauthorised" };
+        const seeds = row[0].seeds as Seeds;
+        if (!seeds[seed].valid) return { status: false, msg: "unauthorised" };
+        const res = await db.select().from(users).where(eq(users.uid, uid));
+        if (res.length !== 0) {
+            const tokens = await generateClientTokens(uid, appId, client_id)
+            return { status: true, msg: "authorised", tokens, refreshed: true };
+        }
+    } else {
+        return { status: false, msg: "unauthorised" };
+    }
+    return { status: false, msg: "unauthorised" };
+};
+
 export const generateUid = (length = 32) =>
-    crypto.randomBytes(128).toString("hex").substring(0, length);
+    crypto.randomBytes(256).toString("hex").substring(0, length);
 
 export const saveUser = async (user: User) => {
     const res = await db.insert(users).values(user).returning();
@@ -163,6 +198,56 @@ export const updateTokens = async (uid: string, seed: string) => {
         .returning();
     if (!!res && res.length !== 0) return { status: true };
     return { status: false };
+};
+
+export const updateClientTokens = async (
+    uid: string,
+    appId: string,
+    seed: string
+) => {
+    const res = await db
+        .insert(clientSeeds)
+        .values({
+            uid,
+            appId,
+            seeds: { [seed]: { start: Date.now(), valid: true } },
+        })
+        .onConflictDoUpdate({
+            target: [clientSeeds.uid, clientSeeds.appId],
+            set: { seeds: { [seed]: { start: Date.now(), valid: true } } },
+        })
+        .returning();
+    if (!!res && res.length !== 0) return { status: true };
+    return { status: false };
+};
+
+export const generateClientTokens = async (
+    uid: string,
+    appId: string,
+    client_id: string
+) => {
+    const seed = generateUid(16);
+    const payload = (usage: string) => ({
+        uid: uid,
+        seed,
+        appId,
+        client_id,
+        usage,
+    });
+    if (!secret) {
+        throw new Error("JWT_KEY must be defined");
+    }
+    const access_token = jwt.sign(payload("access")!, secret, {
+        issuer: "https://auth.anurags.tech",
+        expiresIn: "5m",
+    });
+    const refresh_token = jwt.sign(payload("refresh"), secret, {
+        issuer: "https://auth.anurags.tech",
+        expiresIn: "30d",
+    });
+    const { status } = await updateClientTokens(uid, appId, seed);
+    if (!status) throw new Error("Error while updating refresh_token");
+    return { access_token, refresh_token, uid };
 };
 
 export const generateTokens = async (user: DbUser) => {

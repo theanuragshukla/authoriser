@@ -22,6 +22,7 @@
     "@types/react-dom": "18.2.7",
     "axios": "^1.5.1",
     "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
     "cookies-next": "^4.0.0",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
@@ -30,8 +31,10 @@
     "eslint-config-next": "13.5.2",
     "formik": "^2.4.5",
     "framer-motion": "^10.16.4",
+    "fs": "^0.0.1-security",
     "iconsax-react": "^0.0.8",
-    "jose": "^4.15.2",
+    "ioredis": "^5.3.2",
+    "jose": "^4.15.4",
     "jsonwebtoken": "^9.0.2",
     "next": "13.5.2",
     "pg": "^8.11.3",
@@ -40,11 +43,14 @@
     "react-icons": "^4.11.0",
     "ts-node": "^10.9.1",
     "typescript": "5.2.2",
+    "uuid": "^9.0.1",
     "yup": "^1.2.0",
-    "zod": "^3.22.2"
+    "zod": "^3.22.2",
+    "zustand": "^4.5.1"
   },
   "devDependencies": {
     "@types/pg": "^8.10.2",
+    "@types/uuid": "^9.0.8",
     "drizzle-kit": "^0.19.13"
   }
 }
